@@ -1,0 +1,40 @@
+/* Icono y texto blancos en campos type=date (Chrome, Edge, Safari) */
+input[type="date"],
+input[type="date"].form-control,
+input[type="date"].filtro-input,
+input[type="date"].reporte-input {
+    color: #fff !important;
+    color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="date"].form-control::-webkit-calendar-picker-indicator,
+input[type="date"].filtro-input::-webkit-calendar-picker-indicator,
+input[type="date"].reporte-input::-webkit-calendar-picker-indicator {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    opacity: 1 !important;
+    filter: none !important;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px 16px;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+    color: #fff !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+    color: rgba(255, 255, 255, 0.85) !important;
+}

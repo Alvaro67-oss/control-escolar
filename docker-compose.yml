@@ -1,0 +1,73 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      # accesible en tu red local / para pruebas.
+      # una vez que el túnel de Cloudflare esté funcionando, puedes
+      # cambiar esto a "127.0.0.1:8080:80" para que solo tú, desde
+      # esa misma computadora, puedas entrar por este puerto directo.
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      DB_HOST: mysql
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: America/Mexico_City
+    ports:
+      # solo accesible desde esta misma computadora (para un cliente SQL local)
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    ports:
+      # phpMyAdmin nunca debe quedar público en internet
+      - "127.0.0.1:8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # Cloudflare Tunnel: expone "web" a internet sin abrir puertos en tu router.
+  # No arranca con "docker compose up" normal — solo con:
+  #   docker compose --profile tunnel up -d
+  # Necesitas poner tu CLOUDFLARE_TUNNEL_TOKEN en el .env primero
+  # (ver PRODUCCION.md).
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - web
+    profiles: ["tunnel"]
+
+volumes:
+  db_data:
